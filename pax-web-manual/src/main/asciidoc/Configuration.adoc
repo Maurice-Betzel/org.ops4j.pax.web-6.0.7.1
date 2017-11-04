@@ -1,0 +1,63 @@
+
+////
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	 
+	    http://www.apache.org/licenses/LICENSE-2.0
+	 
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+
+////
+
+= Configuration
+
+Pax Web can be configured using
+Configuration Admin or via framework/system properties.
+
+While looking for a configuration property, Pax Web will first use the
+property configured via Configuration Admin. If the property is not set
+(present), it will look for a framework/system property with the same
+name. In the end, if the property is still not present it will use a
+default value (when applicable).
+
+For cases that requires advanced Jetty configuration read
+link:Advanced-Jetty-Configuration.html[Advanced Jetty
+Configuration] page.
+
+
+[[Configuration-ConfigurationviaOSGiConfigurationAdminService]]
+== Configuration via OSGi Configuration Admin Service
+
+Pax Web can be configured via Configuration
+Admin Service (if available) and it supports all properties listed
+above. +
+ The PID used for configuration is "**org.ops4j.pax.web**".
+
+[[Configuration-ConfigurationviaOSGiframework_systempropertiesproperties]]
+== Configuration via OSGi framework/system properties properties
+
+Pax Web can be configured via osgi
+environment properties and it supports all properties from above. Note
+that according to OSGi specs if a framework property is not set then the
+framework must fallback to using standard Java System properties (set
+via vm -D option).
+
+// Push titles down one level
+:leveloffset: +1
+
+include::Basic-Configuration.adoc[]
+
+include::Advanced-Jetty-Configuration.adoc[]
+
+include::SSL-Configuration.adoc[]
+
+include::JSP-Configuration.adoc[]
+
+// Return to normal title levels
+:leveloffset: -1

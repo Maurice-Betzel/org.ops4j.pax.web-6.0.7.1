@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<!-- Licensed under the Apache License, Version 2.0 (the "License"); you 
+		may not use this file except in compliance with the License. You may obtain 
+		a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless 
+		required by applicable law or agreed to in writing, software distributed 
+		under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+		OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+		the specific language governing permissions and limitations under the License. -->
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.ops4j.pax</groupId>
+		<artifactId>web</artifactId>
+		<version>6.0.7.1</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+	<groupId>org.ops4j.pax.web</groupId>
+	<artifactId>pax-web-manual</artifactId>
+	<name>OPS4J Pax Web - Manual</name>
+	<packaging>war</packaging>
+
+
+	<properties>
+		<docs.test-sources>${project.build.directory}/test-sources</docs.test-sources>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-test-sources</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<classifier>test-sources</classifier>
+							<includeClassifiers>test-sources</includeClassifiers>
+							<excludeTransitive>true</excludeTransitive>
+							<useSubDirectoryPerArtifact>true</useSubDirectoryPerArtifact>
+							<stripVersion>true</stripVersion>
+							<excludes>META-INF,META-INF/**</excludes>
+							<type>jar</type>
+							<outputDirectory>${docs.test-sources}</outputDirectory>
+							<includeArtifactIds>pax-web-itest-container-jetty</includeArtifactIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctor-maven-plugin</artifactId>
+				<version>1.5.2</version>
+				<executions>
+					<execution>
+						<id>output-html</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<configuration>
+							<sourceHighlighter>coderay</sourceHighlighter>
+							<backend>html5</backend>
+							<doctype>article</doctype>
+							<attributes>
+								<toc>left</toc>
+								<toc-position>left</toc-position>
+								<toclevels>3</toclevels>
+								<icons>font</icons>
+								<docVersion>${project.version}</docVersion>
+								<sectanchors>true</sectanchors>
+								<idprefix />
+								<idseparator>-</idseparator>
+								<docinfo1>true</docinfo1>
+								<linkcss>false</linkcss>
+								<sourcedir>../../../target/test-sources</sourcedir>
+								<docVersion>${project.version}</docVersion>
+								<tomcatVersion>${dependency.tomcat.version}</tomcatVersion>
+								<jettyVersion>${dependency.jetty.version}</jettyVersion>
+								<undertowVersion>${dependency.undertow.version}</undertowVersion>
+								<latestStableVersion>${baseline.version}</latestStableVersion>
+								<servletVersion>${servlet.spec.version}</servletVersion>
+								<jspVersion>${servlet-jsp.spec.version}</jspVersion>
+								<jsfVersion>${jsf-myfaces.version}</jsfVersion>
+							</attributes>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<headerFooter>true</headerFooter>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${project.build.directory}/generated-docs</directory>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<inherited>false</inherited>
+
+				<executions>
+					<execution>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.ops4j.pax.web.itest.container</groupId>
+			<artifactId>pax-web-itest-container-jetty</artifactId>
+			<classifier>test-sources</classifier>
+			<scope>provided</scope>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

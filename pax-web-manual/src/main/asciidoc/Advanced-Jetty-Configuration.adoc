@@ -1,0 +1,123 @@
+
+////
+
+	Licensed under the Apache License, Version 2.0 (the "License");
+	you may not use this file except in compliance with the License.
+	You may obtain a copy of the License at
+	 
+	    http://www.apache.org/licenses/LICENSE-2.0
+	 
+	Unless required by applicable law or agreed to in writing, software
+	distributed under the License is distributed on an "AS IS" BASIS,
+	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+	See the License for the specific language governing permissions and
+	limitations under the License.
+
+////
+
+= Advanced Jetty Configuration
+
+To configure advanced features of Jetty you may use jetty xml style
+configuration files. To make Pax Web aware of your Jety configuration
+files you will have to use **fragments**. Be aware that fragment bundles
+are not yet fully supported on all OSGi implementations!
+
+As an example, it’s shown enabling JMX in Jetty.
+
+== OSGi-Bundle Fragment way
+
+To customize Jetty used by Pax Web Service follow instructions:
+Create a bundle fragment for Pax Web Service bundle
+for example:
+
+[source, property]
+----
+Manifest-Version: 1.0
+Fragment-Host: org.ops4j.pax.web.pax-web-jetty-bundle # <1>
+Bundle-Version: 0.1
+Bundle-Name: My Jetty config
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: my.jetty_config
+----
+<1> the required line in the manifest.
+
+WARNING: If the version you are using is
+the non bundled version of jetty bundle you should use
+`org.ops4j.pax.web.pax-web-jetty` instead of
+`org.ops4j.pax.web.pax-web-jetty-bundle` as value of `Fragment-Host`.
+
+Put jetty.xml in root directory of fragment.
+For example, take a look at a simple example fragment bundle from Pax
+Web that will add an additional connector on port `8383`.
+
+https://github.com/ops4j/org.ops4j.pax.web/tree/master/samples/jetty-config-fragment/src/main/resources/jetty.xml
+
+Add fragment to your start configuration
+If you have logging at DEBUG level enabled, when you start, you should
+see in logs something like this:
+
+-------------------------------------------------------------------------------------------------
+DEBUG  pax.web.service.internal.JettyServerImpl  - starting JettyServerImpl{}
+DEBUG  pax.web.service.internal.JettyServerImpl  - configure using bundleresource://100/jetty.xml
+-------------------------------------------------------------------------------------------------
+
+NOTE: Note that the url
+``bundleresource://100/jetty.xml'' from above is just an example as the
+url is framework specific
+
+== Using external jetty.xml file
+
+Sometimes it's needed to have a much more easier way of configuring the underlying Jetty server.
+An external located jetty.xml file can be used for configuring the jetty server.
+This can be activated by setting the following property for Pax Web
+
+--------------------------------------------------
+org.ops4j.pax.web.config.file=<FILE-IN-FILESYSTEM>
+--------------------------------------------------
+
+For more details on how to configure the Jetty Server take a look at the
+official
+http://wiki.eclipse.org/Jetty/Reference/jetty.xml_syntax[jetty.xml] configuring
+page.
+
+== Adding specialized ContextHandlers
+
+If you want to add specialized ContextHandlers to the jetty server you
+have to be careful not to break the way Pax Web works. So Instead of defining a
+new Collection of Handlers in the jetty.xml you need to add your
+specialized ContextHandler to the existing Collection.
+
+Here is an example where the jetty Default Servlet is used to server static
+content from the file system.
+
+[source,xml]
+-------------------------------------------------------------------
+  <Get name="handler">
+    <Call name="addHandler">
+      <Arg>
+        <New class="org.eclipse.jetty.servlet.ServletContextHandler">
+          <Set name="contextPath">/app</Set>
+          <Set name="resourceBase">/path/to/your/share</Set>
+          <Call name="addServlet">
+            <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
+            <Arg>/</Arg>
+          </Call>
+        </New>
+      </Arg>
+    </Call>
+  </Get>
+-------------------------------------------------------------------
+
+== Using Handler and Connectors as Services
+
+IMPORTANT: The Following described way of working is only valid starting
+with version - 4.1.0
+
+All possible Handler or Connector configurations to Jetty through the jetty.xml
+file can now be registered as Services. With this it's possible to register the
+previously made sample of specialized ContextHandler as service.
+
+[source,java,indent=0]
+----
+include::{sourcedir}/pax-web-itest-container-jetty-test-sources-jar/org/ops4j/pax/web/itest/jetty/JettyHandlerServiceIntegrationTest.java[lines=101..108]
+----
